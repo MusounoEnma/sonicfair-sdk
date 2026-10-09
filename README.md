@@ -1,65 +1,172 @@
-# SonicFair: Batch Dutch Auction SDK on Sonic
+# SonicFair: Dual-Engine Auction SDK on Sonic
 
-Infrastruktur dan Developer SDK open-source untuk menyelenggarakan **Batch Dutch Auction dengan Uniform Clearing Price, 100% Lossless Bidding, dan Integrasi FeeM Native** di jaringan **Sonic**.
+[![Network](https://img.shields.io/badge/Network-Sonic_Testnet_(14601)-blue.svg)](https://testnet.soniclabs.com)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-e6e6e6.svg)](https://soliditylang.org/)
+[![Foundry](https://img.shields.io/badge/Foundry-18%2F18_Passed-brightgreen.svg)](https://getfoundry.sh/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Siap diajukan ke **Sonic Labs Innovator Fund**.
+**SonicFair** is an open-source Developer SDK and high-performance Dual-Engine Auction Infrastructure engineered specifically for **Sonic’s** ~400ms block finality and native **Fee Monetization (FeeM)** mechanism.
 
----
-
-## 🌐 Live Deployed Testnet Contracts (Sonic Testnet - Chain ID 14601)
-
-* **Mode 1 Contract (Batch Uniform):** [`0x8b962894916a9bB298A766325319dEe4c2cc5AB0`](https://testnet.sonicscan.org/address/0x8b962894916a9bB298A766325319dEe4c2cc5AB0)
-  * Multi-wallet live bidding simulation verified on-chain.
-* **Mode 2 Contract (Continuous Time-Decay):** [`0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0`](https://testnet.sonicscan.org/address/0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0)
-  * Real-time decaying purchase verified on-chain (Tx confirmed in block #19074369).
-* **Sample Auction Token (SLT):** [`0x261eCcb3579061dee8458811edb44f39bf1e07A2`](https://testnet.sonicscan.org/address/0x261eCcb3579061dee8458811edb44f39bf1e07A2)
+Targeted for the **Sonic Labs Innovator Fund**.
 
 ---
 
-## 📁 Struktur Proyek & Deliverables
+## 🌐 Live On-Chain Deployments (Sonic Testnet - Chain ID 14601)
 
-* `src/SonicBatchAuction.sol` — Engine 1: Batch Dutch Auction (Uniform Clearing Price, Anti-sniping, Per-Address Cap, 100% Refund, Integrasi FeeM Sonic).
-* `src/SonicDecayingAuction.sol` — Engine 2: Continuous Time-Decaying Dutch Auction (Harga turun halus tiap detik/blok ~400ms, Auto-Change Refund, Early Sell-Out).
-* `test/SonicBatchAuction.t.sol` — Test suite Foundry untuk Batch Mode (8 tests lolos + 256 fuzz runs).
-* `test/SonicDecayingAuction.t.sol` — Test suite Foundry untuk Decaying Mode (6 tests lolos + 256 fuzz runs).
-* `test/mocks/MockERC20.sol` — Mock token ERC20 untuk simulasi peluncuran token lelang.
-* `scripts/simulate_auction.py` — Simulasi Monte Carlo memvalidasi 100 agen pembeli, membuktikan ketahanan terhadap bot sniping & manipulasi paus.
-* `scripts/deploy_batch_auction.py` — Script 1-klik untuk deploy kontrak ke Sonic Testnet (Chain ID 14601).
-* `scripts/simulate_testnet_bidding.py` — Simulator multi-wallet otomatis yang menghasilkan live bidding di testnet.
-* `sdk/` — TypeScript SDK (`@sonicplay/batch-auction-sdk`) lengkap dengan type definitions untuk kedua engine lelang.
-* `SONIC_INNOVATOR_PROPOSAL.md` — Dokumen proposal resmi siap kirim ke portal hibah Sonic Labs.
-* `OUTREACH_EMAIL.md` — Draf pesan outreach resmi via Email dan Telegram untuk tim DevRel / BD Sonic.
+| Contract / Asset | Deployed Address | SonicScan Explorer |
+| :--- | :--- | :--- |
+| **Mode 1: Batch Uniform Clearing Auction** | `0x8b962894916a9bB298A766325319dEe4c2cc5AB0` | [View on SonicScan](https://testnet.sonicscan.org/address/0x8b962894916a9bB298A766325319dEe4c2cc5AB0) |
+| **Mode 2: Decaying Dutch Auction** | `0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0` | [View on SonicScan](https://testnet.sonicscan.org/address/0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0) |
+| **Sample Launch Token (SLT)** | `0x261eCcb3579061dee8458811edb44f39bf1e07A2` | [View on SonicScan](https://testnet.sonicscan.org/address/0x261eCcb3579061dee8458811edb44f39bf1e07A2) |
+| **Sonic FeeM Registrar Hook** | `0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830` | Auto-registered (90% Gas Cashback) |
+
+### Verifiable On-Chain Interaction Proofs
+* **Mode 1 Live Bidding Proof:** Block `#19074456` ([Tx Hash `0x6aa2eb...`](https://testnet.sonicscan.org/tx/0x6aa2ebc623abd6624adb77e70cf09fcc60f70be6c32cfedb74cbca765d3d24ee))
+* **Mode 2 Real-Time Decayed Buy Proof:** Block `#19074369` ([Tx Hash `0x2e13db...`](https://testnet.sonicscan.org/tx/0x2e13dbb0720334a82e983f755092600525369b9a14d9f9f14ed29aa8c1ba25d7))
 
 ---
 
-## 🚀 Panduan Verifikasi & Eksekusi
+## 💡 Why SonicFair? The Problem We Solve
 
-### 1. Jalankan Seluruh Unit Test & Fuzzing (Foundry)
-```bash
-forge test -vv
+Token and NFT launches across standard EVM chains suffer from severe market failures:
+1. **Predatory MEV Snipers & Sandwich Bots:** Traditional bonding curves (e.g., Pump.fun forks) and AMM liquidity additions are heavily sniped by bots that dump on retail participants within the first few seconds.
+2. **Negative-Sum Bidding & Retail Fear:** Bidders hesitate because participating early guarantees front-running, while participating late guarantees overpaying.
+3. **Lack of High-Speed Native Standards:** Despite Sonic's sub-second finality and FeeM economic incentives, builders lack a standardized, MEV-resistant price-discovery toolkit.
+
+**SonicFair solves this with a Dual-Engine Architecture:**
+
 ```
-*Hasil:* 18/18 tests lulus (100% passing rate di 3 test suite).
+                  ┌────────────────────────────────────────┐
+                  │          SONICFAIR DUAL-ENGINE         │
+                  └───────────────────┬────────────────────┘
+                                      │
+            ┌─────────────────────────┴─────────────────────────┐
+            ▼                                                   ▼
+┌───────────────────────────────┐                   ┌───────────────────────────────┐
+│     ENGINE 1: BATCH UNIFORM   │                   │    ENGINE 2: TIME-DECAYING    │
+│       CLEARING PRICE          │                   │         DUTCH ENGINE          │
+├───────────────────────────────┤                   ├───────────────────────────────┤
+│ • DeFi Fair Launches          │                   │ • Gaming Items, NFTs & Flashes│
+│ • Uniform Equilibrium Price   │                   │ • Linear Decay Every ~400ms   │
+│ • 100% Lossless Full Refunds  │                   │ • Instant Execution at P(t)   │
+│ • Anti-Sniping Timer Window   │                   │ • Auto-Change Refund Safety   │
+│ • Per-Address Anti-Whale Cap  │                   │ • Instant Sellout Conclusion  │
+└───────────────────────────────┘                   └───────────────────────────────┘
+            │                                                   │
+            └─────────────────────────┬─────────────────────────┘
+                                      ▼
+                  ┌────────────────────────────────────────┐
+                  │    NATIVE SONIC FeeM REGISTRAR HOOK    │
+                  │        (90% Gas Fee Cashback)          │
+                  └────────────────────────────────────────┘
+```
 
-### 2. Jalankan Simulasi Berbasis Agen (Monte Carlo)
+---
+
+## ⚙️ Core Engines & Mechanisms
+
+### Engine 1: Batch Dutch Auction (Uniform Clearing Price)
+* **Discrete Accumulation:** Bidders submit native $S deposits along with their maximum willingness to pay ($P_{max}$).
+* **Equilibrium Clearing Price ($P^*$):** At settlement, the contract finds the market clearing price where Cumulative Demand matches Supply.
+* **Uniform Settlement:** All winning bids pay the exact same clearing price $P^*$. Placing a high bid guarantees execution priority without overpaying.
+* **100% Lossless:** Non-winning participants receive a **100% full refund with zero fees and zero penalty**.
+* **Anti-Sniping:** Dynamic 5-minute countdown extension triggered if late bids arrive near the deadline.
+* **Anti-Whale:** Configurable `maxBidPerAddress` prevents monopolization by large capital.
+
+### Engine 2: Continuous Time-Decaying Dutch Auction
+* **Sub-Second Price Decay:** Prices decay continuously and smoothly each block (~400ms) from $P_{start}$ down to $P_{floor}$.
+* **Instant Execution:** Buyers purchase tokens on-demand at the real-time spot price $P(t)$ without delay.
+* **Automatic Change Refund:** If remaining inventory is lower than the buyer's deposit, the contract delivers all remaining tokens and automatically refunds the excess $S$ in the same transaction.
+
+---
+
+## 📂 Repository Structure
+
+```
+.
+├── src/
+│   ├── SonicBatchAuction.sol      # Mode 1: Batch Uniform Clearing Price Engine
+│   ├── SonicDecayingAuction.sol   # Mode 2: Continuous Time-Decaying Dutch Engine
+│   └── SonicWinWinAuction.sol     # Legacy Gamified Bid-to-Earn Reference
+├── test/
+│   ├── SonicBatchAuction.t.sol    # 8 Foundry tests + 256 fuzz runs
+│   ├── SonicDecayingAuction.t.sol # 6 Foundry tests + 256 fuzz runs
+│   ├── SonicWinWinAuction.t.sol   # 4 Foundry tests
+│   └── mocks/MockERC20.sol        # Sample ERC-20 token ($SLT)
+├── scripts/
+│   ├── deploy_batch_auction.py    # 1-click Sonic Testnet deployer for Mode 1
+│   ├── deploy_decaying_auction.py # 1-click Sonic Testnet deployer for Mode 2
+│   ├── simulate_testnet_bidding.py# Live multi-wallet autonomous bidding simulator
+│   ├── simulate_auction.py        # 100-Agent Monte Carlo simulation model
+│   └── verify_live_status.py      # Real-time on-chain state inspection script
+├── sdk/
+│   ├── src/index.ts               # Typed TypeScript SDK (@sonicplay/batch-auction-sdk)
+│   └── README.md                  # SDK integration guide
+├── AUDIT_REPORT.md                # Internal security audit report (5 findings resolved)
+├── SONIC_INNOVATOR_PROPOSAL.md    # Official Sonic Innovator Fund application
+├── OUTREACH_EMAIL.md              # Outreach templates for Sonic BD & DevRel
+└── foundry.toml                   # Foundry configuration
+```
+
+---
+
+## 🧪 Verification & Testing
+
+### 1. Run Automated Foundry Test Suite
+```bash
+forge test -vvv
+```
+**Results:** `18/18 tests passed (100% pass rate across 3 test suites, including 256 fuzzing iterations per engine)`.
+
+### 2. Run 100-Agent Monte Carlo Simulation
 ```bash
 python scripts/simulate_auction.py
 ```
-*Hasil:* Membuktikan secara matematis bahwa bot sniping dinetralisir oleh anti-snipe extension, paus dibatasi oleh address cap, dan peserta kalah mendapatkan refund 100%.
+**Results:** Mathematically validates that late-stage sniping bots are neutralized by the anti-snipe extension, whales are constrained by the per-address cap, and non-winning bidders suffer zero capital loss.
 
-### 3. Deploy ke Sonic Blaze Testnet (Chain ID 57054)
-Jika sudah memiliki private key wallet testnet dengan saldo $S (faucet dari https://testnet.soniclabs.com/account):
+### 3. Check Live On-Chain State on Sonic Testnet
 ```bash
-python scripts/deploy_batch_auction.py <YOUR_PRIVATE_KEY>
+python scripts/verify_live_status.py
 ```
-Script akan:
-1. Mengompilasi kontrak dengan Forge.
-2. Mendeploy token contoh (`MockERC20`).
-3. Mendeploy `SonicBatchAuction.sol`.
-4. Mendanai lelang dengan 10.000 token.
-5. Menampilkan link explorer resmi di `https://testnet.sonicscan.org`.
 
-### 4. Ajukan Proposal ke Sonic Labs
-1. Buka form kontak resmi Sonic: **[https://www.soniclabs.com/contact](https://www.soniclabs.com/contact)** lalu pilih topik **`Request - Grant/ funding proposal`**.
-2. Atau kirim email proposal langsung ke: **`bd@soniclabs.com`** (Cc: `build@soniclabs.com`).
-3. Gunakan draf lengkap dari [`SONIC_INNOVATOR_PROPOSAL.md`](file:///c:/porto/11MYPORTO/CTF/scratch/sonic_winwin_auction/SONIC_INNOVATOR_PROPOSAL.md) dan panduan copy-paste di [`OUTREACH_EMAIL.md`](file:///c:/porto/11MYPORTO/CTF/scratch/sonic_winwin_auction/OUTREACH_EMAIL.md).
-4. Hubungi komunitas developer di **[Builders Telegram (Invite Aktif)](https://t.me/+Mgg7txDrTs43MmM5)** atau Discord Sonic channel `#builders`.
+---
+
+## 🔒 Security Audit Summary
+
+Full audit documentation is available in [`AUDIT_REPORT.md`](AUDIT_REPORT.md).
+
+* **SEC-01 (High - Resolved):** Fixed potential false-positive winning bid claims in batch settlement via explicit `bool won` cutoff tracking.
+* **SEC-02 (Medium - Resolved):** Prevented stuck funds in decaying auctions by implementing automatic change refunds on overpayment.
+* **SEC-03 (Medium - Resolved):** Eliminated reentrancy attack vectors using the Checks-Effects-Interactions (CEI) pattern and mutex guards.
+* **SEC-04 (Low - Resolved):** Resilient anti-sniping window (300s) mitigates validator timestamp drift under Sonic's ~400ms consensus.
+* **SEC-05 (Info - Confirmed):** Sybil resistance enforced through strict per-address deposit ceilings.
+
+---
+
+## 🚀 TypeScript SDK Quickstart
+
+```typescript
+import { ethers } from "ethers";
+import { SonicBatchAuctionClient } from "@sonicplay/batch-auction-sdk";
+
+// 1. Connect to Sonic Testnet (Chain ID 14601)
+const provider = new ethers.JsonRpcProvider("https://rpc.testnet.soniclabs.com");
+const signer = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+
+// 2. Initialize Client
+const client = new SonicBatchAuctionClient("0x8b962894916a9bB298A766325319dEe4c2cc5AB0", signer);
+
+// 3. Place a Bid (50 $S at maximum valuation of 0.05 $S per token)
+const tx = await client.placeBid(ethers.parseEther("50"), ethers.parseEther("0.05"));
+await tx.wait();
+
+// 4. Query Real-Time Market Clearing Price
+const estimate = await client.getClearingPriceEstimate();
+console.log(`Clearing Price: ${ethers.formatEther(estimate.estimatedPrice)} $S`);
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

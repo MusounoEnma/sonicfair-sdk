@@ -25,11 +25,11 @@ def deploy(private_key: str, feem_project_id: int = 0):
     print(f"[*] Deployer Balance: {w3.from_wei(balance, 'ether')} S")
 
     if balance < w3.to_wei('0.1', 'ether'):
-        print("[!] Saldo tidak cukup untuk deploy. Dapatkan faucet testnet di: https://testnet.soniclabs.com/account")
+        print("[!] Insufficient balance to deploy. Claim testnet faucet at: https://testnet.soniclabs.com/account")
         return
 
     # Compile with forge to get bytecode and abi
-    print("[*] Mengompilasi kontrak dengan forge...")
+    print("[*] Compiling contracts with Forge...")
     subprocess.run(["forge", "build"], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))), check=True)
 
     out_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "out", "SonicWinWinAuction.sol", "SonicWinWinAuction.json")
@@ -41,7 +41,7 @@ def deploy(private_key: str, feem_project_id: int = 0):
 
     Contract = w3.eth.contract(abi=abi, bytecode=bytecode)
 
-    print("[*] Mengirim transaksi deployment...")
+    print("[*] Broadcasting deployment transaction...")
     construct_txn = Contract.constructor(feem_project_id).build_transaction({
         'from': account.address,
         'nonce': w3.eth.get_transaction_count(account.address),
@@ -55,21 +55,21 @@ def deploy(private_key: str, feem_project_id: int = 0):
     signed = w3.eth.account.sign_transaction(construct_txn, private_key)
     tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
     print(f"[+] Deploy Tx Hash: {tx_hash.hex()}")
-    print("[*] Menunggu konfirmasi blok (sub-detik)...")
+    print("[*] Awaiting sub-second block confirmation...")
 
     receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     if receipt.status == 1:
-        print(f"\n[✓] Sukses! Kontrak berhasil ter-deploy di Sonic Testnet:")
+        print(f"\n[✓] Success! Contract deployed to Sonic Testnet:")
         print(f"    Contract Address: {receipt.contractAddress}")
         print(f"    Explorer: https://testnet.sonicscan.org/address/{receipt.contractAddress}")
-        print(f"\nUntuk menjalankan bot aktifitas:")
+        print(f"\nTo launch the pacing bot:")
         print(f"    python scripts/bot.py {receipt.contractAddress} {private_key}")
     else:
-        print("[x] Deployment gagal.")
+        print("[x] Deployment transaction reverted.")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Penggunaan:")
+        print("Usage:")
         print("  python scripts/deploy.py <PRIVATE_KEY> [FEEM_PROJECT_ID]")
         sys.exit(1)
 

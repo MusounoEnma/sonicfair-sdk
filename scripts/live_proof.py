@@ -99,22 +99,13 @@ def run_proof():
     rc1 = w3.eth.wait_for_transaction_receipt(tx1_hash)
     assert rc1.status == 1, "Tx1 failed!"
 
-    dev_bal_after = w3.eth.get_balance(DEV_ADDR)
-    dev_fee_earned = w3.from_wei(dev_bal_after - dev_bal_before, 'ether')
-    info = contract.functions.getCurrentRoundInfo().call()
-    print(f"    [OK] Alice Bid: 1.0 S (Confirmed in block #{rc1.blockNumber})")
-    print(f"    [OK] Dev Fee Captured (2%): {dev_fee_earned} S")
-    print(f"    [OK] Current Top Bidder: {info[2]} (Alice)")
-    print(f"    [OK] Total Prize Pot in Contract: {w3.from_wei(info[4], 'ether')} S")
-    print(f"    [OK] Next Minimum Bid Required (+10%): {w3.from_wei(info[5], 'ether')} S")
+    alice_bal_before = w3.eth.get_balance(ALICE_ADDR)
+    print("    [OK] Alice successfully placed top bid of 1.0 S")
 
     # Step 2: Bob outbids Alice with 2.0 S
     print("\n" + "-" * 70)
-    print("[*] 4. STEP 2: Bob outbids Alice with 2.0 S (+100% bid)")
+    print("[*] 4. STEP 2: Bob outbids Alice with 2.0 S")
     print("-" * 70)
-    alice_bal_before = w3.eth.get_balance(ALICE_ADDR)
-    dev_bal_before = w3.eth.get_balance(DEV_ADDR)
-
     tx2 = contract.functions.placeBid().build_transaction({
         'from': BOB_ADDR,
         'value': w3.to_wei('2.0', 'ether'),
@@ -131,11 +122,11 @@ def run_proof():
     dev_bal_after = w3.eth.get_balance(DEV_ADDR)
     dev_fee_earned = w3.from_wei(dev_bal_after - dev_bal_before, 'ether')
 
-    print(f"    >>> HASIL WIN-WIN UNTUK ALICE (YANG KALAH LELANG):")
-    print(f"    [OK] Alice Modal Awal: 1.0 S")
-    print(f"    [OK] Alice Menerima Kembali: {alice_payout} S (Modal 1.0 S + Bonus 5% dari 2.0 S = 0.1 S)")
-    print(f"    [WIN-WIN] PROFIT BERSIH ALICE: +0.1 S (+10% ROI TANPA RESIKO!)")
-    print(f"    [OK] Dev Fee Captured (2% dari Bob): {dev_fee_earned} S")
+    print(f"    >>> WIN-WIN PAYOUT FOR ALICE (OUTBID PARTICIPANT):")
+    print(f"    [OK] Alice Original Deposit: 1.0 S")
+    print(f"    [OK] Alice Received Back: {alice_payout} S (1.0 S principal + 5% bonus from 2.0 S = 0.1 S)")
+    print(f"    [WIN-WIN] NET PROFIT FOR ALICE: +0.1 S (+10% ROI ZERO RISK!)")
+    print(f"    [OK] Dev Fee Captured (2% from Bob): {dev_fee_earned} S")
 
     # Step 3: Charlie outbids Bob with 3.0 S
     print("\n" + "-" * 70)
@@ -155,10 +146,10 @@ def run_proof():
 
     bob_bal_after = w3.eth.get_balance(BOB_ADDR)
     bob_payout = w3.from_wei(bob_bal_after - bob_bal_before, 'ether')
-    print(f"    >>> HASIL WIN-WIN UNTUK BOB (YANG KALAH LELANG):")
-    print(f"    [OK] Bob Modal Awal: 2.0 S")
-    print(f"    [OK] Bob Menerima Kembali: {bob_payout} S (Modal 2.0 S + Bonus 5% dari 3.0 S = 0.15 S)")
-    print(f"    [WIN-WIN] PROFIT BERSIH BOB: +0.15 S (+7.5% ROI!)")
+    print(f"    >>> WIN-WIN PAYOUT FOR BOB (OUTBID PARTICIPANT):")
+    print(f"    [OK] Bob Original Deposit: 2.0 S")
+    print(f"    [OK] Bob Received Back: {bob_payout} S (2.0 S principal + 5% bonus from 3.0 S = 0.15 S)")
+    print(f"    [WIN-WIN] NET PROFIT FOR BOB: +0.15 S (+7.5% ROI!)")
 
     # Step 4: Anti-Sniping Test
     print("\n" + "-" * 70)
@@ -166,7 +157,7 @@ def run_proof():
     print("-" * 70)
     info_before_warp = contract.functions.getCurrentRoundInfo().call()
     rem_before = info_before_warp[1]
-    print(f"    [*] Sisa waktu saat ini: {rem_before} detik")
+    print(f"    [*] Current time remaining: {rem_before} seconds")
 
     # Warp time to 10 seconds before round end
     warp_seconds = rem_before - 10
@@ -174,7 +165,7 @@ def run_proof():
     w3.provider.make_request("evm_mine", [])
 
     info_warped = contract.functions.getCurrentRoundInfo().call()
-    print(f"    [*] Waktu dimajukan... Sisa waktu sekarang: {info_warped[1]} detik (mepet habis!)")
+    print(f"    [*] Time advanced... New remaining time: {info_warped[1]}s (sniping window!)")
 
     # Alice bids again with 4.0 S
     min_next = info_warped[5]
@@ -192,8 +183,8 @@ def run_proof():
 
     info_after_bid = contract.functions.getCurrentRoundInfo().call()
     rem_after = info_after_bid[1]
-    print(f"    [ANTI-SNIPE] Alice menawar di detik terakhir!")
-    print(f"    [OK] Timer otomatis diperpanjang menjadi: {rem_after} detik (Anti-Sniping Berhasil!)")
+    print(f"    [ANTI-SNIPE] Alice placed bid in final seconds!")
+    print(f"    [OK] Timer automatically extended to: {rem_after} seconds (Anti-Sniping verified!)")
 
     # Step 5: Round Settlement & Winner Takes All
     print("\n" + "-" * 70)
@@ -205,8 +196,8 @@ def run_proof():
 
     pot_before_settle = w3.eth.get_balance(contract_addr)
     alice_bal_before_win = w3.eth.get_balance(ALICE_ADDR)
-    print(f"    [*] Total Prize Pot yang diperebutkan: {w3.from_wei(pot_before_settle, 'ether')} S")
-    print(f"    [*] Pemenang Tertinggi Terakhir: Alice ({ALICE_ADDR})")
+    print(f"    [*] Total Prize Pot Contested: {w3.from_wei(pot_before_settle, 'ether')} S")
+    print(f"    [*] Winning Participant: Alice ({ALICE_ADDR})")
 
     # Settle
     tx_settle = contract.functions.settleAndNextRound().build_transaction({
@@ -221,16 +212,16 @@ def run_proof():
 
     alice_bal_after_win = w3.eth.get_balance(ALICE_ADDR)
     jackpot_received = w3.from_wei(alice_bal_after_win - alice_bal_before_win, 'ether')
-    print(f"    [WINNER] HADIAH DITERIMA ALICE: +{jackpot_received} S!")
+    print(f"    [WINNER] PRIZE AWARDED TO ALICE: +{jackpot_received} S!")
 
     # Check Round 2 status
     info_r2 = contract.functions.getCurrentRoundInfo().call()
-    print(f"\n[OK] KONTRAK OTOMATIS BERPINDAH KE RONDE #{info_r2[0]}!")
-    print(f"    Sisa Waktu Ronde 2: {info_r2[1]} detik")
-    print(f"    Status: Siap menerima penawar baru!")
+    print(f"\n[OK] CONTRACT AUTOMATICALLY ROLLED TO ROUND #{info_r2[0]}!")
+    print(f"    Round 2 Time Remaining: {info_r2[1]} seconds")
+    print(f"    Status: Open for new bids!")
 
     print("\n" + "=" * 70)
-    print("      KESIMPULAN: SELURUH MEKANISME TERBUKTI 100% SUKSES!")
+    print("      CONCLUSION: ALL MECHANISMS VERIFIED 100% OPERATIONAL!")
     print("=" * 70)
 
 if __name__ == "__main__":

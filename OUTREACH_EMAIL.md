@@ -1,33 +1,33 @@
 # SonicFair Outreach & Grant Submission Guide
 
-Dokumen ini berisi panduan dan draf pesan resmi untuk mengajukan proposal ke tim **Sonic Labs (Innovator Fund / BD Team)** melalui form website maupun email langsung.
+This document contains official application templates and instructions for submitting the **SonicFair** proposal to the **Sonic Labs Innovator Fund / BD Team**.
 
 ---
 
-## 📌 Ringkasan Jalur Kontak Resmi Sonic Labs
+## 📌 Official Contact Channels for Sonic Labs
 
-1. **Website Contact Form (Rekomendasi Utama):**
+1. **Official Website Contact Form (Primary Channel):**
    * URL: [https://www.soniclabs.com/contact](https://www.soniclabs.com/contact)
-   * Topic: **`Request - Grant/ funding proposal`**
+   * Topic: Select **`Request - Grant/ funding proposal`** *(Dedicated dropdown option)*
 2. **Direct BD & DevRel Email:**
    * Business Development: `bd@soniclabs.com`
-   * Developer Support & Builders: `build@soniclabs.com`
-3. **Builders Telegram (Invite Aktif):**
+   * Developer Support: `build@soniclabs.com`
+3. **Builders Telegram Group:**
    * [https://t.me/+Mgg7txDrTs43MmM5](https://t.me/+Mgg7txDrTs43MmM5)
 4. **Official Discord:**
-   * [https://discord.gg/3Ynr2QDSnB](https://discord.gg/3Ynr2QDSnB) *(Channel `#builders` atau `#dev-chat`)*
+   * [https://discord.gg/3Ynr2QDSnB](https://discord.gg/3Ynr2QDSnB) *(Channels `#builders` or `#dev-chat`)*
 
 ---
 
-## 1. Draf Lengkap untuk Web Form di https://www.soniclabs.com/contact
+## 1. Ready-to-Submit Message for https://www.soniclabs.com/contact
 
-Isi kolom form:
-* **First name:** [Nama Depan Anda]
-* **Last name:** [Nama Belakang Anda]
-* **Email address:** [Email Anda]
-* **Company:** `SonicFair` *(atau nama studio/tim Anda)*
-* **Topic:** `Request - Grant/ funding proposal`
-* **Message:** *(Salin teks di bawah ini ke kotak Message)*
+Form Fields:
+* **First name:** [Your First Name]
+* **Last name:** [Your Last Name]
+* **Email address:** [Your Active Email]
+* **Company:** `SonicFair`
+* **Topic:** Select `Request - Grant/ funding proposal`
+* **Message:** *(Copy and paste the template below)*
 
 ```text
 Dear Sonic Labs Ecosystem & Grants Team,
@@ -89,16 +89,38 @@ We would love to coordinate with the BD and Grants review team on next steps.
 Best regards,
 MusounoEnma
 Lead Developer, SonicFair
-Telegram: @[UsernameTelegramAnda]
 GitHub: https://github.com/MusounoEnma
-Email: [EmailAnda]
+Email: [YourEmail]
 ```
 
 ---
 
-## 2. Format Email Langsung (Kirim ke bd@soniclabs.com & build@soniclabs.com)
+## 2. Direct Email Format (Send to bd@soniclabs.com & build@soniclabs.com)
 
 * **To:** `bd@soniclabs.com`
 * **Cc:** `build@soniclabs.com`
 * **Subject:** `Grant Proposal: SonicFair SDK — Dual-Engine Batch & Dutch Auction Standard on Sonic`
-* **Body:** Gunakan teks lengkap di atas.
+* **Body:** Use the full text above.
+
+---
+
+## 3. Short Telegram / Discord Message (For Builders Chat & DevRel)
+
+Send to the Sonic Builders Telegram ([t.me/+Mgg7txDrTs43MmM5](https://t.me/+Mgg7txDrTs43MmM5)) or Discord channel `#builders`:
+
+```text
+Hi Sonic Team / DevRel,
+
+Reaching out from the SonicFair team! We’ve built and deployed an open-source Dual-Engine Auction SDK tailored for Sonic's high throughput and native FeeM:
+
+• Batch Uniform Clearing Price Engine: Fair launch with 100% lossless refunds for non-winning bids, dynamic anti-sniping, and anti-whale caps.
+• Continuous Time-Decaying Engine: Smooth per-block decay (~400ms) with instant settlement and auto change refunds.
+• Native FeeM Hook: Integrated with 0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830 for 90% gas fee monetization.
+• Status: 18/18 Foundry tests passed, live on Sonic Testnet (Batch: 0x8b962894916a9bB298A766325319dEe4c2cc5AB0 | Decaying: 0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0), accompanied by a TypeScript SDK and full security audit.
+• GitHub: https://github.com/MusounoEnma/sonicfair-sdk
+
+We have submitted our application for the Sonic Innovator Fund via soniclabs.com/contact. Would love to connect with someone from the BD or Grants team!
+
+Thanks!
+Telegram: @[YourTelegramHandle]
+```

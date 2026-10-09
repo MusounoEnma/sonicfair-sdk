@@ -75,11 +75,11 @@ def run_bot(contract_address: str, private_key: str):
             min_next_bid = info[5]
             bid_count = info[6]
 
-            print(f"[Round #{round_id}] Sisa Waktu: {remaining}s | Bids: {bid_count} | Pot: {w3.from_wei(prize_pot, 'ether')} S | Min Bid: {w3.from_wei(min_next_bid, 'ether')} S")
+            print(f"[Round #{round_id}] Time Left: {remaining}s | Bids: {bid_count} | Pot: {w3.from_wei(prize_pot, 'ether')} S | Min Bid: {w3.from_wei(min_next_bid, 'ether')} S")
 
             # Condition 1: Round expired -> Settle
             if remaining == 0:
-                print(f"[*] Round #{round_id} selesai! Mengeksekusi settleAndNextRound()...")
+                print(f"[*] Round #{round_id} ended! Executing settleAndNextRound()...")
                 tx = contract.functions.settleAndNextRound().build_transaction({
                     'from': account.address,
                     'nonce': w3.eth.get_transaction_count(account.address),
@@ -92,7 +92,7 @@ def run_bot(contract_address: str, private_key: str):
                 tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
                 print(f"[+] Settle Tx Sent: {tx_hash.hex()} (Waiting confirmation...)")
                 w3.eth.wait_for_transaction_receipt(tx_hash)
-                print(f"[✓] Round baru berhasil dimulai!")
+                print(f"[✓] New round started successfully!")
                 time.sleep(3)
                 continue
 
@@ -100,7 +100,7 @@ def run_bot(contract_address: str, private_key: str):
             if top_bidder.lower() != account.address.lower():
                 # Check if wallet has sufficient balance
                 if balance > min_next_bid + w3.to_wei('0.01', 'ether'):
-                    print(f"[*] Bot bersiap memasang bid: {w3.from_wei(min_next_bid, 'ether')} S...")
+                    print(f"[*] Bot submitting bid: {w3.from_wei(min_next_bid, 'ether')} S...")
                     tx = contract.functions.placeBid().build_transaction({
                         'from': account.address,
                         'value': min_next_bid,
@@ -115,17 +115,17 @@ def run_bot(contract_address: str, private_key: str):
                     print(f"[+] Bid Tx Sent: {tx_hash.hex()}")
                     receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
                     if receipt.status == 1:
-                        print(f"[✓] Bid terkonfirmasi di blok #{receipt.blockNumber} (Sub-second execution)!")
+                        print(f"[✓] Bid confirmed in block #{receipt.blockNumber} (Sub-second execution)!")
                     else:
-                        print(f"[x] Bid transaksi gagal.")
+                        print(f"[x] Bid transaction reverted.")
                 else:
-                    print(f"[!] Saldo bot tidak mencukupi untuk bid berikutnya.")
+                    print(f"[!] Bot balance insufficient for next bid increment.")
 
             # Sleep interval
             time.sleep(5)
 
         except KeyboardInterrupt:
-            print("\n[*] Bot dihentikan oleh user.")
+            print("\n[*] Bot stopped by user.")
             break
         except Exception as e:
             print(f"[!] Error loop: {e}")
@@ -133,9 +133,9 @@ def run_bot(contract_address: str, private_key: str):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Penggunaan:")
+        print("Usage:")
         print("  python bot.py <CONTRACT_ADDRESS> <PRIVATE_KEY>")
-        print("\nContoh:")
+        print("\nExample:")
         print("  python bot.py 0x1234...5678 0xabc...def")
         sys.exit(1)
 

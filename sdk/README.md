@@ -25,14 +25,14 @@ npm install @sonicplay/batch-auction-sdk ethers
 
 ```typescript
 import { ethers } from "ethers";
-import { SonicBatchAuctionClient, SONIC_BLAZE_TESTNET_CHAIN_ID } from "@sonicplay/batch-auction-sdk";
+import { SonicBatchAuctionClient, SONIC_TESTNET_CHAIN_ID } from "@sonicplay/batch-auction-sdk";
 
-// 1. Connect to Sonic Blaze Testnet (Chain ID: 57054)
-const provider = new ethers.JsonRpcProvider("https://rpc.blaze.soniclabs.com");
+// 1. Connect to Sonic Testnet (Chain ID: 14601)
+const provider = new ethers.JsonRpcProvider("https://rpc.testnet.soniclabs.com");
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
 
 // 2. Initialize Client
-const client = new SonicBatchAuctionClient("0xYourAuctionContractAddress", signer);
+const client = new SonicBatchAuctionClient("0x8b962894916a9bB298A766325319dEe4c2cc5AB0", signer);
 
 // 3. Place a Bid (e.g. 50 $S at max price 0.05 $S per token)
 const amount = ethers.parseEther("50");

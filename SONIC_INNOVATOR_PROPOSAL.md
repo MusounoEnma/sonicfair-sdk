@@ -81,7 +81,7 @@ We structure our proposal into clear, measurable deliverables:
 * TypeScript SDK client (`sdk/src/index.ts`) with typed viem/ethers integration.
 
 ### Milestone 2 (Testnet Pilot & Ecosystem Integration) — *Target: 2 Weeks post-grant*:
-* Deployment and verification on Sonic Blaze Testnet (Chain ID 57054).
+* Deployment and verification on Sonic Testnet (Chain ID 14601).
 * Pilot partnership / integration with 1–2 initial Sonic ecosystem projects (meme launchpad or gaming NFT drop).
 * Interactive developer playground & documentation portal.
 * **Requested Funding:** $10,000 in $S.
@@ -103,7 +103,7 @@ We structure our proposal into clear, measurable deliverables:
 ---
 
 ## 6. Contact Information
-* **Lead Developer / Team:** SonicFair Team
+* **Lead Developer / Team:** MusounoEnma (SonicFair Team)
+* **GitHub:** https://github.com/MusounoEnma/sonicfair-sdk
 * **Telegram:** `@yourhandle` *(Insert handle)*
-* **Twitter / X:** `@yourhandle` *(Optional)*
 * **Email:** `contact@yourdomain.com` *(Insert email)*
