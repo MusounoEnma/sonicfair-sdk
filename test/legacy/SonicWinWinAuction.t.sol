@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
-import "../src/SonicWinWinAuction.sol";
+import "../../src/legacy/SonicWinWinAuction.sol";
 
 contract SonicWinWinAuctionTest is Test {
     SonicWinWinAuction public auction;

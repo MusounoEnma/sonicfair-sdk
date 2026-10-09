@@ -2,10 +2,13 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title SonicWinWinAuction
- * @notice High-Frequency "Bid-to-Earn" Auction Game on Sonic.
- * @dev Outbid participants receive a 100% refund PLUS a 5% profit bonus.
- *      Integrated with Sonic's native Fee Monetization (FeeM) to capture 90% gas rebates.
+ * @title SonicWinWinAuction (LEGACY / EXPERIMENTAL PROTOTYPE)
+ * @notice Deprecated experimental prototype exploring gamified "Bid-to-Earn" incentives.
+ * @dev Retained in `legacy/` for historical research and comparative game-theoretic reference.
+ *      WARNING: NOT intended for production token launches due to shill-bidding attack vectors.
+ *      For production fair launches and token distributions, use:
+ *      - `SonicBatchAuction.sol` (Mode 1: Uniform Clearing Price, 100% lossless, anti-sniping)
+ *      - `SonicDecayingAuction.sol` (Mode 2: Continuous Time-Decaying Dutch, instant buy)
  */
 contract SonicWinWinAuction {
     address public immutable devTreasury;

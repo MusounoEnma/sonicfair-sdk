@@ -13,12 +13,12 @@ Targeted for the **Sonic Labs Innovator Fund**.
 
 ## 🌐 Live On-Chain Deployments (Sonic Testnet - Chain ID 14601)
 
-| Contract / Asset | Deployed Address | SonicScan Explorer |
+| Contract / Asset | Deployed Address | Explorer / Status |
 | :--- | :--- | :--- |
 | **Mode 1: Batch Uniform Clearing Auction** | `0x8b962894916a9bB298A766325319dEe4c2cc5AB0` | [View on SonicScan](https://testnet.sonicscan.org/address/0x8b962894916a9bB298A766325319dEe4c2cc5AB0) |
 | **Mode 2: Decaying Dutch Auction** | `0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0` | [View on SonicScan](https://testnet.sonicscan.org/address/0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0) |
 | **Sample Launch Token (SLT)** | `0x261eCcb3579061dee8458811edb44f39bf1e07A2` | [View on SonicScan](https://testnet.sonicscan.org/address/0x261eCcb3579061dee8458811edb44f39bf1e07A2) |
-| **Sonic FeeM Registrar Hook** | `0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830` | Auto-registered (90% Gas Cashback) |
+| **Sonic FeeM Registrar Hook** | `0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830` | Fee Monetization (90% of gas fees routed to developer treasury) |
 
 ### Verifiable On-Chain Interaction Proofs
 * **Mode 1 Live Bidding Proof:** Block `#19074456` ([Tx Hash `0x6aa2eb...`](https://testnet.sonicscan.org/tx/0x6aa2ebc623abd6624adb77e70cf09fcc60f70be6c32cfedb74cbca765d3d24ee))
@@ -57,7 +57,7 @@ Token and NFT launches across standard EVM chains suffer from severe market fail
                                       ▼
                   ┌────────────────────────────────────────┐
                   │    NATIVE SONIC FeeM REGISTRAR HOOK    │
-                  │        (90% Gas Fee Cashback)          │
+                  │  (90% Gas Revenue to Builder Treasury) │
                   └────────────────────────────────────────┘
 ```
 
@@ -87,11 +87,13 @@ Token and NFT launches across standard EVM chains suffer from severe market fail
 ├── src/
 │   ├── SonicBatchAuction.sol      # Mode 1: Batch Uniform Clearing Price Engine
 │   ├── SonicDecayingAuction.sol   # Mode 2: Continuous Time-Decaying Dutch Engine
-│   └── SonicWinWinAuction.sol     # Legacy Gamified Bid-to-Earn Reference
+│   └── legacy/
+│       └── SonicWinWinAuction.sol # Deprecated gamified reference prototype (isolated)
 ├── test/
 │   ├── SonicBatchAuction.t.sol    # 8 Foundry tests + 256 fuzz runs
 │   ├── SonicDecayingAuction.t.sol # 6 Foundry tests + 256 fuzz runs
-│   ├── SonicWinWinAuction.t.sol   # 4 Foundry tests
+│   ├── legacy/
+│   │   └── SonicWinWinAuction.t.sol # 4 Foundry tests for deprecated reference
 │   └── mocks/MockERC20.sol        # Sample ERC-20 token ($SLT)
 ├── scripts/
 │   ├── deploy_batch_auction.py    # 1-click Sonic Testnet deployer for Mode 1
@@ -102,7 +104,7 @@ Token and NFT launches across standard EVM chains suffer from severe market fail
 ├── sdk/
 │   ├── src/index.ts               # Typed TypeScript SDK (@sonicplay/batch-auction-sdk)
 │   └── README.md                  # SDK integration guide
-├── AUDIT_REPORT.md                # Internal security audit report (5 findings resolved)
+├── AUDIT_REPORT.md                # Internal Security Review Report (pre-audit status)
 ├── SONIC_INNOVATOR_PROPOSAL.md    # Official Sonic Innovator Fund application
 ├── OUTREACH_EMAIL.md              # Outreach templates for Sonic BD & DevRel
 └── foundry.toml                   # Foundry configuration
@@ -122,7 +124,7 @@ forge test -vvv
 ```bash
 python scripts/simulate_auction.py
 ```
-**Results:** Mathematically validates that late-stage sniping bots are neutralized by the anti-snipe extension, whales are constrained by the per-address cap, and non-winning bidders suffer zero capital loss.
+**Results:** Multi-agent Monte Carlo simulations (modeled with 100 heterogeneous agents under varying risk tolerance, valuation distributions, and arrival intervals) demonstrate that anti-snipe countdown extensions systematically disincentivize last-second sniping bots, whale concentration is bounded by per-address caps, and non-clearing bidders experience zero capital haircuts (100% principal refunded under modeled conditions).
 
 ### 3. Check Live On-Chain State on Sonic Testnet
 ```bash
@@ -131,10 +133,12 @@ python scripts/verify_live_status.py
 
 ---
 
-## 🔒 Security Audit Summary
+## 🔒 Security & Code Review Status
 
-Full audit documentation is available in [`AUDIT_REPORT.md`](AUDIT_REPORT.md).
+> [!IMPORTANT]
+> **Internal Security Review Notice:** The current contracts have completed automated testing, property-based fuzzing (256 runs per engine), and an internal security review documented in [`AUDIT_REPORT.md`](AUDIT_REPORT.md). **These contracts are deployed on Sonic Testnet for developer evaluation and pilot integrations.** In alignment with Milestone 3 of our [Sonic Innovator Fund Proposal](SONIC_INNOVATOR_PROPOSAL.md), a formal independent third-party audit will be completed prior to mainnet production deployment.
 
+### Internal Review Findings & Mitigations
 * **SEC-01 (High - Resolved):** Fixed potential false-positive winning bid claims in batch settlement via explicit `bool won` cutoff tracking.
 * **SEC-02 (Medium - Resolved):** Prevented stuck funds in decaying auctions by implementing automatic change refunds on overpayment.
 * **SEC-03 (Medium - Resolved):** Eliminated reentrancy attack vectors using the Checks-Effects-Interactions (CEI) pattern and mutex guards.
@@ -143,7 +147,40 @@ Full audit documentation is available in [`AUDIT_REPORT.md`](AUDIT_REPORT.md).
 
 ---
 
+## ⚠️ Known Limitations & Production Architecture Roadmap
+
+To maintain complete transparency for ecosystem developers and reviewing auditors, the following architectural considerations are identified and scheduled for refinement:
+
+1. **Batch Settlement Gas Scaling (Winner Cutoff Iteration):**
+   * *Mechanism:* Mode 1 features $O(1)$ bidding via client-side sorting and on-chain hint verification. During `settleAuction()`, the contract marks winning bidders and aggregates clearing metrics.
+   * *Consideration:* For auctions with very large cutoff sets (>1,000 winning bidders), iterating across all winners in a single transaction can approach EVM block gas bounds.
+   * *Production Roadmap (Milestones 2 & 3):* Introduce paginated settlement batches (`settleAuctionChunk(startIdx, count)`) or off-chain state computation verified via an on-chain Merkle root commitment to support arbitrarily large participant pools.
+
+2. **Anti-Sniping Extension Bounds:**
+   * *Mechanism:* Bids submitted within the final 5 minutes automatically extend the auction duration by 5 minutes to prevent front-running.
+   * *Consideration:* In theoretical adversarial conditions, griefers could place recurring minor bids to prolong auction closure.
+   * *Production Roadmap:* Enforce an immutable `maxExtensionTime` ceiling (e.g., maximum 2 hours total extension past original deadline) and require a minimum bid threshold to trigger time extensions.
+
+3. **Legacy Contract Deprecation:**
+   * The earlier prototype `SonicWinWinAuction.sol` (gamified outbid fee sharing) has been isolated to [`src/legacy/`](src/legacy/SonicWinWinAuction.sol). Outbid commission models are deprecated for public token launches due to shill bidding risks; the core focus of SonicFair is strictly lossless fair discovery (Modes 1 and 2).
+
+---
+
 ## 🚀 TypeScript SDK Quickstart
+
+### Installation & Build
+Build the typed TypeScript client directly from the repository:
+
+```bash
+cd sdk
+npm install
+npm run build
+```
+
+### Usage Example
+
+> [!WARNING]
+> **Private Key Safety:** Never hardcode or commit private keys. Always use burner/developer keys for testnet interactions and ensure `.env` is included in `.gitignore`.
 
 ```typescript
 import { ethers } from "ethers";
