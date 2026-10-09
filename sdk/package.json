@@ -1,0 +1,27 @@
+{
+  "name": "@sonicplay/batch-auction-sdk",
+  "version": "1.0.0",
+  "description": "Open-Source Batch Dutch Auction with Uniform Clearing Price SDK for Sonic",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "sonic",
+    "defi",
+    "auction",
+    "dutch-auction",
+    "uniform-clearing-price",
+    "sdk"
+  ],
+  "author": "SonicPlay Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "ethers": "^6.0.0",
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,25 @@
+# Foundry artifacts
+out/
+cache/
+
+# Node & dependencies
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Sensitive Keys & Environment Variables (CRITICAL)
+*.txt
+*.key
+*.env
+.env*
+secrets/
+
+# OS metadata
+.DS_Store
+Thumbs.db
