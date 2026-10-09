@@ -5,7 +5,6 @@
 **Reviewed Targets:**
 1. `src/SonicBatchAuction.sol` (Mode 1: Batch Uniform Clearing Price)
 2. `src/SonicDecayingAuction.sol` (Mode 2: Continuous Time-Decaying Dutch Auction)
-3. `src/legacy/SonicWinWinAuction.sol` (Deprecated Reference Prototype)
 
 > **Important Disclosure:** This report documents an **internal security review** conducted via manual code inspection, automated Foundry fuzzing (256 property runs per suite), and Monte Carlo agent simulations. It does **not** substitute for an accredited independent third-party audit. In accordance with the Sonic Innovator Fund application roadmap, a formal external security audit is budgeted and scheduled under **Milestone 3** before mainnet deployment.
 
@@ -16,7 +15,7 @@
 An internal security and game-theoretic review of the **SonicFair Dual-Engine SDK** was conducted. The review evaluated reentrancy, integer arithmetic, economic incentives, front-running / MEV vectors, and Sonic-specific runtime behaviors (sub-second finality, FeeM integration).
 
 **Status Verdict:** **TESTNET-READY / PRE-AUDIT VALIDATED**.  
-All identified edge cases have been resolved in the codebase and verified with 18 automated Foundry test suites and Monte Carlo simulations.
+All identified edge cases have been resolved in the codebase and verified with 14 automated Foundry tests (across 2 test suites, including 256 fuzzing iterations per engine) and Monte Carlo simulations.
 
 ---
 

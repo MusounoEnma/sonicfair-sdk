@@ -2,7 +2,7 @@
 
 [![Network](https://img.shields.io/badge/Network-Sonic_Testnet_(14601)-blue.svg)](https://testnet.soniclabs.com)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-e6e6e6.svg)](https://soliditylang.org/)
-[![Foundry](https://img.shields.io/badge/Foundry-18%2F18_Passed-brightgreen.svg)](https://getfoundry.sh/)
+[![Foundry](https://img.shields.io/badge/Foundry-14%2F14_Passed-brightgreen.svg)](https://getfoundry.sh/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **SonicFair** is an open-source Developer SDK and high-performance Dual-Engine Auction Infrastructure engineered specifically for **Sonic’s** ~400ms block finality and native **Fee Monetization (FeeM)** mechanism.
@@ -86,14 +86,10 @@ Token and NFT launches across standard EVM chains suffer from severe market fail
 .
 ├── src/
 │   ├── SonicBatchAuction.sol      # Mode 1: Batch Uniform Clearing Price Engine
-│   ├── SonicDecayingAuction.sol   # Mode 2: Continuous Time-Decaying Dutch Engine
-│   └── legacy/
-│       └── SonicWinWinAuction.sol # Deprecated gamified reference prototype (isolated)
+│   └── SonicDecayingAuction.sol   # Mode 2: Continuous Time-Decaying Dutch Engine
 ├── test/
 │   ├── SonicBatchAuction.t.sol    # 8 Foundry tests + 256 fuzz runs
 │   ├── SonicDecayingAuction.t.sol # 6 Foundry tests + 256 fuzz runs
-│   ├── legacy/
-│   │   └── SonicWinWinAuction.t.sol # 4 Foundry tests for deprecated reference
 │   └── mocks/MockERC20.sol        # Sample ERC-20 token ($SLT)
 ├── scripts/
 │   ├── deploy_batch_auction.py    # 1-click Sonic Testnet deployer for Mode 1
@@ -118,7 +114,7 @@ Token and NFT launches across standard EVM chains suffer from severe market fail
 ```bash
 forge test -vvv
 ```
-**Results:** `18/18 tests passed (100% pass rate across 3 test suites, including 256 fuzzing iterations per engine)`.
+**Results:** `14/14 tests passed (100% pass rate across 2 test suites, including 256 fuzzing iterations per engine)`.
 
 ### 2. Run 100-Agent Monte Carlo Simulation
 ```bash
@@ -160,9 +156,6 @@ To maintain complete transparency for ecosystem developers and reviewing auditor
    * *Mechanism:* Bids submitted within the final 5 minutes automatically extend the auction duration by 5 minutes to prevent front-running.
    * *Consideration:* In theoretical adversarial conditions, griefers could place recurring minor bids to prolong auction closure.
    * *Production Roadmap:* Enforce an immutable `maxExtensionTime` ceiling (e.g., maximum 2 hours total extension past original deadline) and require a minimum bid threshold to trigger time extensions.
-
-3. **Legacy Contract Deprecation:**
-   * The earlier prototype `SonicWinWinAuction.sol` (gamified outbid fee sharing) has been isolated to [`src/legacy/`](src/legacy/SonicWinWinAuction.sol). Outbid commission models are deprecated for public token launches due to shill bidding risks; the core focus of SonicFair is strictly lossless fair discovery (Modes 1 and 2).
 
 ---
 
