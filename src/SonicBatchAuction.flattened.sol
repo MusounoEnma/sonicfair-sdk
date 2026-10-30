@@ -40,6 +40,8 @@ contract SonicBatchAuction {
     uint256 public immutable maxBidPerAddress;   // Maximum Native $S deposit allowed per address
     uint256 public immutable antiSnipeWindow;    // Seconds before end that trigger an extension (e.g. 300)
     uint256 public immutable antiSnipeExtension; // Extension duration in seconds (e.g. 300)
+    uint256 public immutable maxAuctionEndTime;  // Hard ceiling: auction cannot extend past this timestamp
+    uint256 public immutable minBidAmount;       // Minimum deposit to prevent 1-wei dust spam & DoS
 
     uint256 public auctionStartTime;
     uint256 public auctionEndTime;
@@ -137,6 +139,10 @@ contract SonicBatchAuction {
 
         auctionStartTime = block.timestamp;
         auctionEndTime = block.timestamp + _duration;
+        // Bounded anti-snipe hard cap: auction duration cannot extend past initial duration + 2 hours
+        uint256 maxExtra = _duration >= 2 hours ? 2 hours : _duration;
+        maxAuctionEndTime = auctionEndTime + maxExtra;
+        minBidAmount = 0.001 ether; // 0.001 $S minimum prevents 1-wei dust spam & DoS
 
         emit AuctionInitialized(
             seller,
@@ -181,7 +187,7 @@ contract SonicBatchAuction {
         require(block.timestamp >= auctionStartTime, "Auction not started");
         require(block.timestamp < auctionEndTime, "Auction ended");
         require(!settled, "Already settled");
-        require(msg.value > 0, "Bid value must be > 0");
+        require(msg.value >= minBidAmount, "Bid below minBidAmount");
         require(_maxPricePerToken >= reservePrice, "Max price below reserve");
         require(
             totalBidByAddress[msg.sender] + msg.value <= maxBidPerAddress,
@@ -205,9 +211,10 @@ contract SonicBatchAuction {
         // Insert into sortedBidIds descending by maxPricePerToken
         _insertSortedBid(newBidId, _maxPricePerToken, _hintIndex);
 
-        // Anti-sniping check
+        // Anti-sniping check: extends countdown dynamically but strictly bounded by maxAuctionEndTime
         if (auctionEndTime - block.timestamp < antiSnipeWindow) {
-            auctionEndTime = block.timestamp + antiSnipeExtension;
+            uint256 extended = block.timestamp + antiSnipeExtension;
+            auctionEndTime = extended > maxAuctionEndTime ? maxAuctionEndTime : extended;
         }
 
         emit BidPlaced(newBidId, msg.sender, msg.value, _maxPricePerToken, auctionEndTime);

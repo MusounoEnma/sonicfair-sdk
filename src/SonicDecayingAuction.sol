@@ -24,8 +24,8 @@ contract SonicDecayingAuction {
     uint256 public immutable totalTokensOffered;
     uint256 public immutable startPrice;  // Ceiling price (wei of $S per 1e18 tokens)
     uint256 public immutable floorPrice;  // Floor reserve price (wei of $S per 1e18 tokens)
-    uint256 public immutable startTime;
-    uint256 public immutable endTime;
+    uint256 public startTime;             // Activated upon depositOfferedTokens()
+    uint256 public endTime;               // Activated upon depositOfferedTokens()
     uint256 public immutable duration;
     uint256 public feemProjectId;
 
@@ -90,8 +90,6 @@ contract SonicDecayingAuction {
         startPrice = _startPrice;
         floorPrice = _floorPrice;
         duration = _duration;
-        startTime = block.timestamp;
-        endTime = block.timestamp + _duration;
         feemProjectId = _feemProjectId;
 
         emit AuctionInitialized(
@@ -100,8 +98,8 @@ contract SonicDecayingAuction {
             _totalTokensOffered,
             _startPrice,
             _floorPrice,
-            startTime,
-            endTime
+            0,
+            0
         );
     }
 
@@ -111,6 +109,8 @@ contract SonicDecayingAuction {
     function depositOfferedTokens() external onlySeller {
         require(!tokensDeposited, "Already deposited");
         tokensDeposited = true;
+        startTime = block.timestamp;
+        endTime = block.timestamp + duration;
         bool funded = IERC20(tokenOffered).transferFrom(msg.sender, address(this), totalTokensOffered);
         require(funded, "Token deposit failed");
     }
@@ -132,7 +132,7 @@ contract SonicDecayingAuction {
      * @return currentPrice Current price in wei of $S per 1e18 token units
      */
     function getCurrentPrice() public view returns (uint256 currentPrice) {
-        if (block.timestamp <= startTime) {
+        if (!tokensDeposited || block.timestamp <= startTime) {
             return startPrice;
         }
         if (block.timestamp >= endTime) {
@@ -148,7 +148,7 @@ contract SonicDecayingAuction {
      * @notice Buy tokens at the current real-time decaying price
      */
     function buyTokens() external payable nonReentrant {
-        require(tokensDeposited || IERC20(tokenOffered).balanceOf(address(this)) >= remainingTokens, "Auction not funded yet");
+        require(tokensDeposited, "Auction not funded yet");
         require(block.timestamp >= startTime, "Auction not started");
         require(block.timestamp <= endTime, "Auction ended");
         require(!auctionClosed, "Auction already closed");
@@ -200,6 +200,7 @@ contract SonicDecayingAuction {
      * @notice Settle and close auction, sending proceeds and unsold tokens to seller
      */
     function closeAuction() external nonReentrant {
+        require(tokensDeposited, "Auction not funded yet");
         require(block.timestamp >= endTime || remainingTokens == 0, "Auction still ongoing");
         require(!auctionClosed, "Already closed");
         _closeAuction();

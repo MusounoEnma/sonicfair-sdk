@@ -136,4 +136,46 @@ contract SonicDecayingAuctionTest is Test {
 
         assertTrue(token.balanceOf(bob) > 0);
     }
+
+    function test_PriceDoesNotDecayBeforeDeposit() public {
+        // Deploy fresh auction without deposit
+        vm.prank(seller);
+        SonicDecayingAuction fresh = new SonicDecayingAuction(
+            address(token),
+            TOTAL_TOKENS,
+            START_PRICE,
+            FLOOR_PRICE,
+            DURATION,
+            FEEM_PROJECT_ID
+        );
+
+        // Advance time by 6 hours before seller deposits tokens
+        vm.warp(block.timestamp + 6 hours);
+
+        // Price MUST still be at START_PRICE (no decay occurred yet)
+        assertEq(fresh.getCurrentPrice(), START_PRICE);
+        assertEq(fresh.tokensDeposited(), false);
+
+        // Buyer cannot purchase before deposit
+        vm.prank(alice);
+        vm.expectRevert("Auction not funded yet");
+        fresh.buyTokens{value: 1 ether}();
+
+        // Seller now deposits tokens
+        token.mint(seller, TOTAL_TOKENS);
+        vm.startPrank(seller);
+        token.approve(address(fresh), TOTAL_TOKENS);
+        fresh.depositOfferedTokens();
+        vm.stopPrank();
+
+        // Auction is now live, startTime matches deposit timestamp
+        assertEq(fresh.tokensDeposited(), true);
+        assertEq(fresh.startTime(), block.timestamp);
+        assertEq(fresh.getCurrentPrice(), START_PRICE);
+
+        // 12 hours later, decay proceeds normally
+        vm.warp(block.timestamp + 12 hours);
+        assertEq(fresh.getCurrentPrice(), 0.55 ether);
+    }
 }
+

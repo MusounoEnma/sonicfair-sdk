@@ -2,7 +2,7 @@
 
 [![Network](https://img.shields.io/badge/Network-Sonic_Testnet_(14601)-blue.svg)](https://testnet.soniclabs.com)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-e6e6e6.svg)](https://soliditylang.org/)
-[![Foundry](https://img.shields.io/badge/Foundry-14%2F14_Passed-brightgreen.svg)](https://getfoundry.sh/)
+[![Foundry](https://img.shields.io/badge/Foundry-17%2F17_Passed-brightgreen.svg)](https://getfoundry.sh/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **SonicFair** is an open-source Developer SDK and high-performance Dual-Engine Auction Infrastructure engineered specifically for **Sonic’s** ~400ms block finality and native **Fee Monetization (FeeM)** mechanism.
@@ -114,7 +114,7 @@ Token and NFT launches across standard EVM chains suffer from severe market fail
 ```bash
 forge test -vvv
 ```
-**Results:** `14/14 tests passed (100% pass rate across 2 test suites, including 256 fuzzing iterations per engine)`.
+**Results:** `17/17 tests passed (100% pass rate across 2 test suites, including 256 fuzzing iterations per engine)`.
 
 ### 2. Run 100-Agent Monte Carlo Simulation
 ```bash
@@ -140,6 +140,8 @@ python scripts/verify_live_status.py
 * **SEC-03 (Medium - Resolved):** Eliminated reentrancy attack vectors using the Checks-Effects-Interactions (CEI) pattern and mutex guards.
 * **SEC-04 (Low - Resolved):** Resilient anti-sniping window (300s) mitigates validator timestamp drift under Sonic's ~400ms consensus.
 * **SEC-05 (Info - Confirmed):** Sybil resistance enforced through strict per-address deposit ceilings.
+* **SEC-06 (Medium - Resolved):** Prevented perpetual anti-snipe extension griefing and dust DoS via `maxAuctionEndTime` ceiling and `minBidAmount = 0.001 $S` floor.
+* **SEC-07 (Low - Resolved):** Eliminated unfunded premature price decay by dynamically initiating auction timing upon seller inventory deposit (`depositOfferedTokens()`).
 
 ---
 

@@ -28,6 +28,8 @@ All identified edge cases have been resolved in the codebase and verified with 1
 | **SEC-03** | Reentrancy Vectors on Native $S Transfers & FeeM Hook | **MEDIUM** | **RESOLVED** |
 | **SEC-04** | Timestamp Dependence & Sub-Second Anti-Sniping Window | **LOW** | **RESOLVED** |
 | **SEC-05** | Per-Address Sybil Resistance & Anti-Whale Enforcement | **INFO** | **CONFIRMED** |
+| **SEC-06** | Perpetual Anti-Snipe Extension Griefing & Dust Bid Flooding | **MEDIUM** | **RESOLVED** |
+| **SEC-07** | Premature Price Decay Prior to Token Funding Deposit | **LOW** | **RESOLVED** |
 
 ---
 
@@ -85,10 +87,32 @@ All identified edge cases have been resolved in the codebase and verified with 1
 
 ---
 
+### [SEC-06] Perpetual Anti-Snipe Extension Griefing & Dust Bid Flooding
+* **Severity:** **MEDIUM**
+* **Target:** `SonicBatchAuction.sol` (`placeBid`)
+* **Description:** Without an explicit minimum bid and hard deadline ceiling, an attacker could repeatedly place dust bids (e.g. 1 wei) within the final countdown window, continually triggering `auctionEndTime = block.timestamp + antiSnipeExtension`. This would lock bidder capital and seller tokens indefinitely.
+* **Mitigation:**
+  1. Enforced `minBidAmount = 0.001 ether` (`require(msg.value >= minBidAmount)`), eliminating dust spam.
+  2. Implemented an immutable `maxAuctionEndTime = auctionEndTime + maxExtra` hard ceiling beyond which no extension can push the auction deadline.
+* **Status:** **Resolved and verified via Foundry (`test_AntiSnipingEnforcesHardCap`, `test_RevertIfBidBelowMinAmount`).**
+
+---
+
+### [SEC-07] Premature Price Decay Prior to Token Funding Deposit
+* **Severity:** **LOW**
+* **Target:** `SonicDecayingAuction.sol` (`startTime`, `getCurrentPrice`, `depositOfferedTokens`)
+* **Description:** Setting `startTime = block.timestamp` in the constructor meant that if a seller delayed depositing inventory tokens, the price decayed prematurely before the sale opened.
+* **Mitigation:**
+  * Initialized `startTime` and `endTime` dynamically within `depositOfferedTokens()`.
+  * `getCurrentPrice()` returns `startPrice` prior to deposit, and `buyTokens()` strictly requires `tokensDeposited`.
+* **Status:** **Resolved and verified via Foundry (`test_PriceDoesNotDecayBeforeDeposit`).**
+
+---
+
 ## 4. Test & Verification Coverage
 
 ### Automated Test Suite:
-* **Total Tests:** 18 Tests across 3 Suites (100% Pass Rate).
+* **Total Tests:** 17 Tests across 2 Suites (100% Pass Rate).
 * **Fuzz Testing:** 256 randomized property runs per fuzz suite.
 * **Gas Optimizations:** Hint-based insertion eliminates on-chain sorting overhead.
 

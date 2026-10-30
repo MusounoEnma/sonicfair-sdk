@@ -229,4 +229,30 @@ contract SonicBatchAuctionTest is Test {
         // Dave either has tokens or got full refund, never loses funds unexpectedly
         assertTrue(token.balanceOf(dave) > 0 || dave.balance == bidAmount);
     }
+
+    function test_AntiSnipingEnforcesHardCap() public {
+        uint256 hardCap = auction.maxAuctionEndTime();
+        assertTrue(hardCap > auction.auctionEndTime());
+
+        // Repeatedly bid inside anti-snipe window to try to push past hardCap
+        for (uint256 i = 0; i < 30; i++) {
+            uint256 currentEnd = auction.auctionEndTime();
+            if (currentEnd >= hardCap) break;
+            vm.warp(currentEnd - 60);
+            address bidder = address(uint160(0x99000 + i));
+            vm.deal(bidder, 1 ether);
+            vm.prank(bidder);
+            auction.placeBid{value: 0.01 ether}(0.05 ether, 0);
+        }
+
+        // Must strictly not exceed hardCap
+        assertEq(auction.auctionEndTime(), hardCap);
+    }
+
+    function test_RevertIfBidBelowMinAmount() public {
+        vm.prank(alice);
+        vm.expectRevert("Bid below minBidAmount");
+        auction.placeBid{value: 1 wei}(0.05 ether, 0);
+    }
 }
+

@@ -76,9 +76,9 @@ Existing token and NFT launch models on EVM chains are fundamentally broken:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 5. READINESS & DELIVERABLES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Testing: 18/18 Foundry tests passing (including 256 fuzz runs per engine).
+- Testing: 17/17 Foundry tests passing (including 256 fuzz runs per engine).
 - Simulation: 100-Agent Monte Carlo simulation proving anti-sniping and whale resistance.
-- Security Audit: Internal audit completed with 5 findings resolved (CEI pattern, reentrancy guards, cutoff won tracking).
+- Security Audit: Internal audit completed with 7 findings resolved (anti-snipe hard ceiling, deposit-activated decay timer, CEI pattern, reentrancy guards, cutoff won tracking).
 - Developer SDK: Packaged with typed TypeScript SDK (@sonicplay/batch-auction-sdk).
 
 Full source code, simulation scripts, audit report, and milestone breakdown are available on GitHub:
@@ -117,7 +117,7 @@ Reaching out from the SonicFair team! We’ve built and deployed an open-source 
 • Batch Uniform Clearing Price Engine: Fair launch with 100% lossless refunds for non-winning bids, dynamic anti-sniping, and anti-whale caps.
 • Continuous Time-Decaying Engine: Smooth per-block decay (~400ms) with instant settlement and auto change refunds.
 • Native FeeM Hook: Integrated with 0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830 for 90% gas fee monetization.
-• Status: 18/18 Foundry tests passed, live on Sonic Testnet (Batch: 0x8b962894916a9bB298A766325319dEe4c2cc5AB0 | Decaying: 0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0), accompanied by a TypeScript SDK and full security audit.
+• Status: 17/17 Foundry tests passed, live on Sonic Testnet (Batch: 0x8b962894916a9bB298A766325319dEe4c2cc5AB0 | Decaying: 0xdf5B8E3AEB35c262ebd81216b985ede9a2c771c0), accompanied by a TypeScript SDK and full security audit.
 • GitHub: https://github.com/MusounoEnma/sonicfair-sdk
 
 We have submitted our application for the Sonic Innovator Fund via soniclabs.com/contact. Would love to connect with someone from the BD or Grants team!
