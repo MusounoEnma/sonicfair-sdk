@@ -34,6 +34,8 @@ export const SONIC_BATCH_AUCTION_ABI = [
   "function claimAll()",
   "function getUserBids(address user) view returns (uint256[])",
   "function totalBidsCount() view returns (uint256)",
+  "function sortedBidIds(uint256) view returns (uint256)",
+  "function bids(uint256) view returns (uint256 id, address bidder, uint256 amount, uint256 maxPricePerToken, uint256 timestamp, bool claimed, bool won)",
   "function registerFeeM()"
 ] as const;
 
@@ -103,9 +105,44 @@ export class SonicBatchAuctionClient {
     };
   }
 
-  async placeBid(amountWei: bigint, maxPricePerTokenWei: bigint, hintIndex: number = 0): Promise<any> {
+  /**
+   * Calculates optimal insertion hintIndex off-chain to minimize on-chain gas costs
+   */
+  async findInsertionHint(maxPricePerTokenWei: bigint): Promise<number> {
     const contract = this.getContract(SONIC_BATCH_AUCTION_ABI);
-    return await contract.placeBid(maxPricePerTokenWei, hintIndex, { value: amountWei });
+    const count = Number(await contract.totalBidsCount());
+    if (count === 0) return 0;
+
+    let low = 0;
+    let high = count;
+    while (low < high) {
+      const mid = Math.floor((low + high) / 2);
+      const bidId = await contract.sortedBidIds(mid);
+      const bid = await contract.bids(bidId);
+      const price = BigInt(bid.maxPricePerToken);
+      if (price >= maxPricePerTokenWei) {
+        low = mid + 1;
+      } else {
+        high = mid;
+      }
+    }
+    return low;
+  }
+
+  /**
+   * Place a bid with optional hintIndex. If omitted, the optimal hint is resolved automatically off-chain.
+   */
+  async placeBid(amountWei: bigint, maxPricePerTokenWei: bigint, hintIndex?: number): Promise<any> {
+    const contract = this.getContract(SONIC_BATCH_AUCTION_ABI);
+    let resolvedHint = hintIndex;
+    if (resolvedHint === undefined) {
+      try {
+        resolvedHint = await this.findInsertionHint(maxPricePerTokenWei);
+      } catch (err) {
+        resolvedHint = 0;
+      }
+    }
+    return await contract.placeBid(maxPricePerTokenWei, resolvedHint, { value: amountWei });
   }
 
   async settle(): Promise<any> {
@@ -113,9 +150,19 @@ export class SonicBatchAuctionClient {
     return await contract.settleAuction();
   }
 
+  async claim(bidId: number | bigint): Promise<any> {
+    const contract = this.getContract(SONIC_BATCH_AUCTION_ABI);
+    return await contract.claim(bidId);
+  }
+
   async claimAll(): Promise<any> {
     const contract = this.getContract(SONIC_BATCH_AUCTION_ABI);
     return await contract.claimAll();
+  }
+
+  async registerFeeM(): Promise<any> {
+    const contract = this.getContract(SONIC_BATCH_AUCTION_ABI);
+    return await contract.registerFeeM();
   }
 
   async getUserBids(userAddress: string): Promise<bigint[]> {
@@ -153,7 +200,8 @@ export const SONIC_DECAYING_AUCTION_ABI = [
   "function buyersCount() view returns (uint256)",
   "function getCurrentPrice() view returns (uint256)",
   "function buyTokens() payable",
-  "function closeAuction()"
+  "function closeAuction()",
+  "function registerFeeM()"
 ] as const;
 
 export interface DecayingAuctionState {
@@ -222,6 +270,11 @@ export class SonicDecayingAuctionClient {
   async closeAuction(): Promise<any> {
     const contract = this.getContract(SONIC_DECAYING_AUCTION_ABI);
     return await contract.closeAuction();
+  }
+
+  async registerFeeM(): Promise<any> {
+    const contract = this.getContract(SONIC_DECAYING_AUCTION_ABI);
+    return await contract.registerFeeM();
   }
 
   private getContract(abi: any): any {

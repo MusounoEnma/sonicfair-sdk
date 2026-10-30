@@ -197,6 +197,16 @@ console.log(`Clearing Price: ${ethers.formatEther(estimate.estimatedPrice)} $S`)
 
 ---
 
+## 👥 Core Team & Contact
+
+* **Lead Developer:** MusounoEnma (SonicFair Team)
+* **GitHub:** [https://github.com/MusounoEnma](https://github.com/MusounoEnma)
+* **Telegram:** [@MusounoKuroichi](https://t.me/MusounoKuroichi)
+* **Discord:** `kurooichii`
+* **Email:** `alddevv@gmail.com`
+
+---
+
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).

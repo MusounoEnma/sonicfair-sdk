@@ -155,24 +155,31 @@ def deploy(private_key: str):
     print(f"  Chain ID         : {CHAIN_ID} (Sonic Blaze Testnet)")
 
 if __name__ == "__main__":
-    pk = None
-    if len(sys.argv) >= 2:
+    # Load private key from ENV, CLI argument, or local key file
+    pk = os.getenv("PRIVATE_KEY")
+    if not pk and len(sys.argv) >= 2:
         pk = sys.argv[1]
-    else:
-        # Check default key.txt locations
+    elif not pk:
         possible_keys = [
-            "c:/porto/11MYPORTO/CTF/key.txt",
-            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), "key.txt"),
-            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "key.txt"),
-            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "key.txt"),
-            "key.txt"
+            ".env",
+            "key.txt",
+            os.path.join(os.path.dirname(__file__), "key.txt")
         ]
         for kpath in possible_keys:
             if os.path.exists(kpath):
                 with open(kpath, "r") as f:
-                    pk = f.read().strip()
-                print(f"[*] Loaded private key from: {kpath}")
-                break
+                    content = f.read().strip()
+                    for line in content.splitlines():
+                        line = line.strip()
+                        if line.startswith("PRIVATE_KEY="):
+                            pk = line.split("=", 1)[1].strip().strip('"').strip("'")
+                            break
+                        elif len(line) in (64, 66) and not line.startswith("#"):
+                            pk = line
+                            break
+                if pk:
+                    print(f"[*] Loaded private key from: {kpath}")
+                    break
 
     if not pk:
         print("Usage: python scripts/deploy_batch_auction.py <YOUR_PRIVATE_KEY>")

@@ -150,20 +150,29 @@ if __name__ == "__main__":
     addr = None
     bots_count = 3
 
-    # Always attempt to load master pk from key.txt first
-    possible_keys = [
-        "c:/porto/11MYPORTO/CTF/key.txt",
-        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), "key.txt"),
-        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "key.txt"),
-        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "key.txt"),
-        "key.txt"
-    ]
-    for kpath in possible_keys:
-        if os.path.exists(kpath):
-            with open(kpath, "r") as f:
-                pk = f.read().strip()
-            print(f"[*] Loaded master private key from: {kpath}")
-            break
+    # Load master pk from ENV, local .env, or local key.txt
+    pk = os.getenv("PRIVATE_KEY")
+    if not pk:
+        possible_keys = [
+            ".env",
+            "key.txt",
+            os.path.join(os.path.dirname(__file__), "key.txt")
+        ]
+        for kpath in possible_keys:
+            if os.path.exists(kpath):
+                with open(kpath, "r") as f:
+                    content = f.read().strip()
+                    for line in content.splitlines():
+                        line = line.strip()
+                        if line.startswith("PRIVATE_KEY="):
+                            pk = line.split("=", 1)[1].strip().strip('"').strip("'")
+                            break
+                        elif len(line) in (64, 66) and not line.startswith("#"):
+                            pk = line
+                            break
+                if pk:
+                    print(f"[*] Loaded master private key from: {kpath}")
+                    break
 
     args = sys.argv[1:]
     # Check if first arg is an address (42 chars, starts with 0x)

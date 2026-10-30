@@ -105,5 +105,6 @@ We structure our proposal into clear, measurable deliverables:
 ## 6. Contact Information
 * **Lead Developer / Team:** MusounoEnma (SonicFair Team)
 * **GitHub:** https://github.com/MusounoEnma/sonicfair-sdk
-* **Telegram:** `@yourhandle` *(Insert handle)*
-* **Email:** `contact@yourdomain.com` *(Insert email)*
+* **Telegram:** [@MusounoKuroichi](https://t.me/MusounoKuroichi)
+* **Discord:** `kurooichii`
+* **Email:** `alddevv@gmail.com`

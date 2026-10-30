@@ -1,11 +1,12 @@
 {
   "name": "@sonicplay/batch-auction-sdk",
   "version": "1.0.0",
-  "description": "Open-Source Batch Dutch Auction with Uniform Clearing Price SDK for Sonic",
+  "description": "Open-Source Dual-Engine Auction SDK (Batch Uniform Clearing & Decaying Dutch) for Sonic",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "sonic",
@@ -13,9 +14,14 @@
     "auction",
     "dutch-auction",
     "uniform-clearing-price",
+    "feem",
     "sdk"
   ],
-  "author": "MusounoEnma (SonicFair Team)",
+  "author": "MusounoEnma (SonicFair Team) <alddevv@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MusounoEnma/sonicfair-sdk.git"
+  },
   "license": "MIT",
   "peerDependencies": {
     "ethers": "^6.0.0"
@@ -25,3 +31,4 @@
     "typescript": "^5.4.0"
   }
 }
+

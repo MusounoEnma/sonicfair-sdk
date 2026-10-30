@@ -22,9 +22,9 @@ This document contains official application templates and instructions for submi
 ## 1. Ready-to-Submit Message for https://www.soniclabs.com/contact
 
 Form Fields:
-* **First name:** [Your First Name]
-* **Last name:** [Your Last Name]
-* **Email address:** [Your Active Email]
+* **First name:** Aldi
+* **Last name:** Musouno
+* **Email address:** alddevv@gmail.com
 * **Company:** `SonicFair`
 * **Topic:** Select `Request - Grant/ funding proposal`
 * **Message:** *(Copy and paste the template below)*
@@ -89,8 +89,9 @@ We would love to coordinate with the BD and Grants review team on next steps.
 Best regards,
 MusounoEnma
 Lead Developer, SonicFair
-GitHub: https://github.com/MusounoEnma
-Email: [YourEmail]
+Email: alddevv@gmail.com
+Telegram: @MusounoKuroichi (https://t.me/MusounoKuroichi)
+Discord: kurooichii
 ```
 
 ---
@@ -122,5 +123,7 @@ Reaching out from the SonicFair team! We’ve built and deployed an open-source 
 We have submitted our application for the Sonic Innovator Fund via soniclabs.com/contact. Would love to connect with someone from the BD or Grants team!
 
 Thanks!
-Telegram: @[YourTelegramHandle]
+Telegram: @MusounoKuroichi (https://t.me/MusounoKuroichi)
+Discord: kurooichii
+Email: alddevv@gmail.com
 ```
